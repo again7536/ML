@@ -15,7 +15,7 @@ def unpickle(file):
     return X, Y
 
 #training variables 
-epochs = 20
+epochs = 40
 batch_size = 200
 nb_class = 10
 
@@ -31,50 +31,42 @@ Y = tf.placeholder(dtype=tf.float32, shape=[None, nb_class])
 keep_prob = tf.placeholder(tf.float32)
 
 with tf.variable_scope('Layer1'):
-    W1 = tf.Variable(tf.random_normal(shape=[5, 5, 3, 96], stddev=0.01), name='W1')
+    W1 = tf.Variable(tf.random_normal(shape=[3, 3, 3, 64], stddev=0.01), name='W1')
     L1 = tf.nn.conv2d(X, W1, strides=[1, 1, 1, 1], padding='SAME', name='Filter1')
     L1 = tf.nn.relu(L1, name='Lelu1')
     L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1,2,2,1], padding='SAME', name='Pool1')
     L1 = tf.nn.dropout(L1, keep_prob=keep_prob)
     L1 = tf.layers.batch_normalization(L1)
-    #shape reduces to [16, 16, 96]
+    #shape reduces to [16, 16, 32]
 
 with tf.variable_scope('Layer2'):
-    W2 = tf.Variable(tf.random_normal(shape=[3, 3, 96, 192], stddev=0.01), name='W2')
+    W2 = tf.Variable(tf.random_normal(shape=[3, 3, 64, 128], stddev=0.01), name='W2')
     L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME', name='Filter2')
     L2 = tf.nn.relu(L2, name='Lelu2')
     L2 = tf.nn.max_pool(L2, ksize=[1,2,3,1], strides=[1,2,2,1], padding='SAME', name='Pool2')
     L2 = tf.nn.dropout(L2, keep_prob=keep_prob)
     L2 = tf.layers.batch_normalization(L2)
-    #shape reduces to [8, 8, 192]
+    #shape reduces to [8, 8, 64]
     
 with tf.variable_scope('Layer3'):
-    W3 = tf.Variable(tf.random_normal(shape=[3, 3, 192, 192], stddev=0.01), name='W3')
+    W3 = tf.Variable(tf.random_normal(shape=[3, 3, 128, 256], stddev=0.01), name='W3')
     L3 = tf.nn.conv2d(L2, W3, strides=[1, 1, 1, 1], padding='SAME', name='Filter3')
     L3 = tf.nn.relu(L3, name='Lelu3')
     L3 = tf.nn.max_pool(L3, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME', name='Pool3')
     L3 = tf.nn.dropout(L3, keep_prob=keep_prob)
     L3 = tf.layers.batch_normalization(L3)
-    #shape reduces to [4, 4, 192]
-
-with tf.variable_scope('Layer5'):
-    W5 = tf.Variable(tf.random_normal(shape=[3, 3, 192, 192], stddev=0.01), name='W5')
-    L5 = tf.nn.conv2d(L3, W5, strides=[1, 1, 1, 1], padding='SAME', name='Filter5')
-    L5 = tf.nn.relu(L5, name='Lelu5')
-    L5 = tf.nn.dropout(L5, keep_prob=keep_prob)
-
-    L5 = tf.reshape(L5, [-1, 4*4*192])
-    L5 = tf.layers.batch_normalization(L5)
+    #shape reduces to [4, 4, 128]
+    L3 = tf.reshape(L3, shape=[-1, 4*4*256])
 
 with tf.variable_scope('Layer6'):
-    W6 = tf.get_variable("W6", shape=[4*4*192, 625], initializer=tf.glorot_normal_initializer())
-    b = tf.Variable(tf.random_normal([625]))
-    L6 = tf.nn.relu(tf.matmul(L5, W6) + b, name='Lelu6')
+    W6 = tf.get_variable("W6", shape=[4*4*256, 512], initializer=tf.glorot_normal_initializer())
+    b = tf.Variable(tf.random_normal([512]))
+    L6 = tf.nn.relu(tf.matmul(L3, W6) + b, name='Lelu6')
     L6 = tf.nn.dropout(L6, keep_prob=keep_prob)
     L6 = tf.layers.batch_normalization(L6)
 
 with tf.variable_scope('Layer7'):
-    W7 = tf.get_variable("W7", shape=[625, 10], initializer=tf.glorot_normal_initializer())
+    W7 = tf.get_variable("W7", shape=[512, 10], initializer=tf.glorot_normal_initializer())
     b2 = tf.Variable(tf.random_normal([10]))
     hypothesis = tf.matmul(L6, W7) + b2
 
