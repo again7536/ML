@@ -1,3 +1,8 @@
+#############################
+##### 75% CIFAR-10 Code #####
+#############################
+
+# import package
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -48,7 +53,7 @@ with tf.variable_scope('Layer1'):
     L1 = tf.nn.max_pool(L1, ksize=[1, 2, 2, 1], strides=[1,2,2,1], padding='SAME', name='Pool1')
     L1 = tf.nn.dropout(L1, keep_prob=keep_prob)
     #L1 = tf.layers.batch_normalization(L1)
-    #shape reduces to [16, 16, 32]
+    #shape reduces to [16, 16, 64]
 
 with tf.variable_scope('Layer2'):
     W2 = tf.Variable(tf.random_normal(shape=[3, 3, 64, 128], stddev=0.01), name='W2')
@@ -57,7 +62,7 @@ with tf.variable_scope('Layer2'):
     L2 = tf.nn.max_pool(L2, ksize=[1,2,3,1], strides=[1,2,2,1], padding='SAME', name='Pool2')
     L2 = tf.nn.dropout(L2, keep_prob=keep_prob)
     L2 = tf.layers.batch_normalization(L2)
-    #shape reduces to [8, 8, 64]
+    #shape reduces to [8, 8, 128]
     
 with tf.variable_scope('Layer3'):
     W3 = tf.Variable(tf.random_normal(shape=[3, 3, 128, 256], stddev=0.01), name='W3')
@@ -66,7 +71,7 @@ with tf.variable_scope('Layer3'):
     L3 = tf.nn.max_pool(L3, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME', name='Pool3')
     L3 = tf.nn.dropout(L3, keep_prob=keep_prob)
     #L3 = tf.layers.batch_normalization(L3)
-    #shape reduces to [4, 4, 128]
+    #shape reduces to [4, 4, 256]
     L3 = tf.reshape(L3, shape=[-1, 4*4*256])
 
 with tf.variable_scope('Layer4'):
