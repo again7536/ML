@@ -22,7 +22,7 @@ def unpickle(file):
     return X, Y
 
 #training variables 
-epochs = 40
+epochs = 160
 batch_size = 512
 nb_class = 10
 
@@ -59,7 +59,7 @@ with tf.variable_scope('Layer2'):
     W2 = tf.Variable(tf.random_normal(shape=[3, 3, 64, 128], stddev=0.01), name='W2')
     L2 = tf.nn.conv2d(L1, W2, strides=[1, 1, 1, 1], padding='SAME', name='Filter2')
     L2 = tf.nn.relu(L2, name='Lelu2')
-    L2 = tf.nn.max_pool(L2, ksize=[1,2,3,1], strides=[1,2,2,1], padding='SAME', name='Pool2')
+    L2 = tf.nn.max_pool(L2, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME', name='Pool2')
     L2 = tf.nn.dropout(L2, keep_prob=keep_prob)
     L2 = tf.layers.batch_normalization(L2)
     #shape reduces to [8, 8, 128]
@@ -104,7 +104,7 @@ with tf.Session() as sess:
             batch_y = Y_data[epoch % 5][i*batch_size:(i+1)*batch_size]
             _, c, a = sess.run([optimizer, cost, accuracy], feed_dict={X:batch_x, Y:batch_y, keep_prob:0.5})
             avg_cost += c / batch_num
-        print(f'Epoch: {epoch}\t Cost: {avg_cost:.6f}\t Accuracy: {a:.4f}')
+        print(f'Epoch: {epoch}   Cost: {avg_cost:.6f}\t Accuracy: {a:.4f}')
 
     print('Accuracy:', sess.run(accuracy, feed_dict={X:X_test[0:batch_size], Y:Y_test[0:batch_size], keep_prob:1.0}))
 
